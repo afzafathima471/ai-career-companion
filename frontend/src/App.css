@@ -1,0 +1,13 @@
+.app {
+  min-height: 100vh;
+  padding: 40px;
+  font-family: Arial, sans-serif;
+}
+
+.app h1 {
+  margin-bottom: 10px;
+}
+
+.app p {
+  color: #666;
+}
