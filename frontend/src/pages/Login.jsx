@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getOrCreateStudent } from "../api";
 
 function CompassMark({ size = 26 }) {
   return (
@@ -46,12 +47,32 @@ function JourneyIllustration() {
 }
 
 export default function Login({ onLogin }) {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    onLogin?.({ email });
+    setError("");
+    setLoading(true);
+    try {
+      // No real auth yet — password isn't checked against anything.
+      // This creates (or fetches, if the email already exists) a real
+      // student record in the backend, so everything after login uses
+      // real data instead of a mock.
+      const student = await getOrCreateStudent({ name, email, target_role: null });
+      onLogin?.(student);
+    } catch (err) {
+      setError(
+        err.message.includes("fetch")
+          ? "Couldn't reach the backend — is it running at http://127.0.0.1:8000?"
+          : err.message
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -96,6 +117,21 @@ export default function Login({ onLogin }) {
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
             <div>
+              <label htmlFor="name" className="text-[13px] text-ink/70">
+                Full name
+              </label>
+              <input
+                id="name"
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Afza Fathima"
+                className="mt-1.5 w-full border border-line bg-white px-3.5 py-2.5 text-[14px] text-ink outline-none placeholder:text-ink/30 focus:border-navy"
+              />
+            </div>
+
+            <div>
               <label htmlFor="email" className="text-[13px] text-ink/70">
                 Email
               </label>
@@ -125,6 +161,12 @@ export default function Login({ onLogin }) {
               />
             </div>
 
+            {error && (
+              <p className="border border-gold/40 bg-gold/10 px-3 py-2 text-[13px] text-ink/80">
+                {error}
+              </p>
+            )}
+
             <div className="flex items-center justify-between text-[13px]">
               <label className="flex items-center gap-2 text-ink/60">
                 <input type="checkbox" className="accent-navy" />
@@ -137,9 +179,10 @@ export default function Login({ onLogin }) {
 
             <button
               type="submit"
-              className="w-full bg-navy py-2.5 text-[14px] font-medium text-white transition-opacity hover:opacity-90"
+              disabled={loading}
+              className="w-full bg-navy py-2.5 text-[14px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
             >
-              Log in
+              {loading ? "Logging in..." : "Log in"}
             </button>
           </form>
 

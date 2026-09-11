@@ -10,32 +10,32 @@ import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import Login from "./pages/Login";
 
-const pages = {
-  Dashboard,
-  Resume,
-  Internships,
-  Interview,
-  Applications,
-  Settings,
-  Help,
-};
-
 export default function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [student, setStudent] = useState(null);
   const [active, setActive] = useState("Dashboard");
 
-  if (!loggedIn) {
-    return <Login onLogin={() => setLoggedIn(true)} />;
+  if (!student) {
+    return <Login onLogin={setStudent} />;
   }
 
-  const ActivePage = pages[active] ?? Dashboard;
+  const pageProps = { student };
+
+  const pages = {
+    Dashboard: <Dashboard {...pageProps} />,
+    Resume: <Resume {...pageProps} />,
+    Internships: <Internships {...pageProps} />,
+    Interview: <Interview {...pageProps} />,
+    Applications: <Applications {...pageProps} />,
+    Settings: <Settings {...pageProps} onStudentUpdate={setStudent} />,
+    Help: <Help {...pageProps} />,
+  };
 
   return (
     <div className="flex bg-paper">
       <Sidebar active={active} onNavigate={setActive} />
       <main className="flex-1">
-        <Topbar title={active} />
-        <ActivePage />
+        <Topbar title={active} userName={student.name} />
+        {pages[active] ?? pages.Dashboard}
       </main>
     </div>
   );

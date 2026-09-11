@@ -52,3 +52,11 @@ def update_student(student_id: str, payload: schemas.StudentUpdate, db: Session 
     db.commit()
     db.refresh(student)
     return student
+
+
+@router.get("/{student_id}/profile", response_model=schemas.StudentProfileOut)
+def get_profile(student_id: str, db: Session = Depends(get_db)):
+    student = db.query(models.Student).filter(models.Student.id == student_id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+    return student
