@@ -81,3 +81,28 @@ class StudentProfileOut(BaseModel):
     education: list[EducationOut]
     experience: list[ExperienceOut]
     projects: list[ProjectOut]
+
+
+class JobOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    title: str
+    company: str
+    location: str | None
+    description: str | None
+    required_skills: str
+
+
+class JobCreate(BaseModel):
+    title: str
+    company: str
+    location: str | None = None
+    description: str | None = None
+    required_skills: list[str]
+
+
+class MatchOut(BaseModel):
+    job: JobOut
+    match_percent: int
+    matched_skills: list[str]
+    missing_skills: list[str]

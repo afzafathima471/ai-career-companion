@@ -65,6 +65,14 @@ export async function uploadResume(studentId, file) {
   });
 }
 
+export function getMatches(studentId) {
+  return request(`/students/${studentId}/matches`);
+}
+
+export function listJobs() {
+  return request("/jobs");
+}
+
 export function parseResume(studentId, resumeId) {
   return request(`/students/${studentId}/resumes/${resumeId}/parse`, {
     method: "POST",

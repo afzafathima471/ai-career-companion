@@ -94,3 +94,15 @@ class Project(Base):
     technologies = Column(String, nullable=True)  # comma-separated for simplicity
 
     student = relationship("Student", back_populates="projects")
+
+
+class Job(Base):
+    __tablename__ = "jobs"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    title = Column(String, nullable=False)
+    company = Column(String, nullable=False)
+    location = Column(String, nullable=True)
+    description = Column(String, nullable=True)
+    required_skills = Column(String, nullable=False)  # comma-separated
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))

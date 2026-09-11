@@ -10,9 +10,29 @@ import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import Login from "./pages/Login";
 
+const STORAGE_KEY = "careerai_student";
+
+function loadStoredStudent() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function App() {
-  const [student, setStudent] = useState(null);
+  const [student, setStudentState] = useState(loadStoredStudent);
   const [active, setActive] = useState("Dashboard");
+
+  function setStudent(value) {
+    setStudentState(value);
+    if (value) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }
 
   if (!student) {
     return <Login onLogin={setStudent} />;
@@ -26,7 +46,7 @@ export default function App() {
     Internships: <Internships {...pageProps} />,
     Interview: <Interview {...pageProps} />,
     Applications: <Applications {...pageProps} />,
-    Settings: <Settings {...pageProps} onStudentUpdate={setStudent} />,
+    Settings: <Settings {...pageProps} onStudentUpdate={setStudent} onLogout={() => setStudent(null)} />,
     Help: <Help {...pageProps} />,
   };
 

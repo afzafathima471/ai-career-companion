@@ -19,7 +19,7 @@ function Toggle({ checked, onChange }) {
   );
 }
 
-export default function Settings() {
+export default function Settings({ onLogout }) {
   const [name, setName] = useState("Afza Fathima");
   const [email, setEmail] = useState("afza@example.com");
   const [emailAlerts, setEmailAlerts] = useState(true);
@@ -110,7 +110,10 @@ export default function Settings() {
         <h2 className="mb-1 font-display text-[17px] text-ink">Account</h2>
         <p className="mb-4 text-[13px] text-ink/50">Sign out or remove your account.</p>
         <div className="flex gap-3">
-          <button className="border border-line px-3.5 py-2 text-[13px] text-ink/70 hover:border-navy/40">
+          <button
+            onClick={onLogout}
+            className="border border-line px-3.5 py-2 text-[13px] text-ink/70 hover:border-navy/40"
+          >
             Log out
           </button>
           <button className="border border-line px-3.5 py-2 text-[13px] text-ink/40 hover:border-ink/30">
