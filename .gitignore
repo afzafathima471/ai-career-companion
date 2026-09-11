@@ -1,4 +1,13 @@
-node_modules/
-.env
-dist/
-build/
+backend/venv/
+backend/__pycache__/
+backend/**/*.py[cod]
+backend/.env
+backend/.env.example
+backend/*.db
+
+frontend/node_modules/
+frontend/dist/
+
+.vscode/
+.DS_Store
+Thumbs.db
