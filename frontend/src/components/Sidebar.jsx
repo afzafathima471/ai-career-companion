@@ -59,12 +59,17 @@ export default function Sidebar({ active, onNavigate }) {
       <div className="border-t border-white/10 px-3 py-4">
         <ul className="space-y-0.5">
           {footerItems.map((item) => {
+            const isActive = item.label === active;
             const Icon = item.icon;
             return (
               <li key={item.label}>
                 <button
                   onClick={() => onNavigate?.(item.label)}
-                  className="flex w-full items-center gap-3 rounded-sm px-3 py-2.5 text-left text-[14px] text-white/50 transition-colors hover:text-white/85"
+                  className={`flex w-full items-center gap-3 rounded-sm border-l-2 px-3 py-2.5 text-left text-[14px] transition-colors ${
+                    isActive
+                      ? "border-gold bg-white/[0.06] text-white"
+                      : "border-transparent text-white/50 hover:text-white/85"
+                  }`}
                 >
                   <Icon size={17} strokeWidth={1.75} />
                   {item.label}
