@@ -43,7 +43,7 @@ export default function App() {
   const pages = {
     Dashboard: <Dashboard {...pageProps} />,
     Resume: <Resume {...pageProps} />,
-    Internships: <Internships {...pageProps} />,
+    "Job-Resume Matching": <Internships {...pageProps} />,
     Interview: <Interview {...pageProps} />,
     Applications: <Applications {...pageProps} />,
     Settings: <Settings {...pageProps} onStudentUpdate={setStudent} onLogout={() => setStudent(null)} />,

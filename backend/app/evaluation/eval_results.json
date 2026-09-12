@@ -1,0 +1,227 @@
+{
+  "frontend_dev": {
+    "precision_at_5": 1.0,
+    "results": [
+      {
+        "title": "Web Design Intern | Part Time, Paid",
+        "company": "PINT",
+        "industry": "Internet",
+        "overall_score": 100,
+        "skill_score": 100,
+        "relevant": true
+      },
+      {
+        "title": "Web Developer intern",
+        "company": "The AdPilot",
+        "industry": "Computer Software",
+        "overall_score": 94,
+        "skill_score": 90,
+        "relevant": true
+      },
+      {
+        "title": "Graduate Intern - Python and Mongo DB",
+        "company": "Visual BI",
+        "industry": "Information Technology and Services",
+        "overall_score": 88,
+        "skill_score": 80,
+        "relevant": true
+      },
+      {
+        "title": "Software Engineer Intern",
+        "company": "Undisclosed Company",
+        "industry": "Internet",
+        "overall_score": 72,
+        "skill_score": 53,
+        "relevant": true
+      },
+      {
+        "title": "Developer Intern",
+        "company": "Undisclosed Company",
+        "industry": null,
+        "overall_score": 72,
+        "skill_score": 53,
+        "relevant": true
+      }
+    ]
+  },
+  "marketing": {
+    "precision_at_5": 1.0,
+    "results": [
+      {
+        "title": "SEO/Content Marketing Intern",
+        "company": "Vend",
+        "industry": "Marketing and Advertising",
+        "overall_score": 94,
+        "skill_score": 90,
+        "relevant": true
+      },
+      {
+        "title": "Internet Marketing Specialist",
+        "company": "Undisclosed Company",
+        "industry": null,
+        "overall_score": 92,
+        "skill_score": 87,
+        "relevant": true
+      },
+      {
+        "title": "Marketing Intern",
+        "company": "Maker\u2019s Row",
+        "industry": "Marketing and Advertising",
+        "overall_score": 72,
+        "skill_score": 53,
+        "relevant": true
+      },
+      {
+        "title": "Digital Marketing Paid Intern",
+        "company": "Undisclosed Company",
+        "industry": "Internet",
+        "overall_score": 70,
+        "skill_score": 50,
+        "relevant": true
+      },
+      {
+        "title": "Marketing and Business Development Intern",
+        "company": "Pardon Services Canada",
+        "industry": "Marketing and Advertising",
+        "overall_score": 66,
+        "skill_score": 44,
+        "relevant": true
+      }
+    ]
+  },
+  "design": {
+    "precision_at_5": 1.0,
+    "results": [
+      {
+        "title": "Graphic Designer (Intern)",
+        "company": "Undisclosed Company",
+        "industry": "Internet",
+        "overall_score": 97,
+        "skill_score": 95,
+        "relevant": true
+      },
+      {
+        "title": "Web Design Intern | Part Time, Paid",
+        "company": "PINT",
+        "industry": "Internet",
+        "overall_score": 88,
+        "skill_score": 80,
+        "relevant": true
+      },
+      {
+        "title": "Graphic Design Intern (Paid)",
+        "company": "Maker\u2019s Row",
+        "industry": "Design",
+        "overall_score": 76,
+        "skill_score": 60,
+        "relevant": true
+      },
+      {
+        "title": "Product Design Internship",
+        "company": "Undisclosed Company",
+        "industry": "Consumer Electronics",
+        "overall_score": 76,
+        "skill_score": 60,
+        "relevant": true
+      },
+      {
+        "title": "Graphic Design Intern",
+        "company": "Undisclosed Company",
+        "industry": "Computer Software",
+        "overall_score": 76,
+        "skill_score": 60,
+        "relevant": true
+      }
+    ]
+  },
+  "data_science": {
+    "precision_at_5": 0.8,
+    "results": [
+      {
+        "title": "Growth Wunderkind (paid internship)",
+        "company": "Undisclosed Company",
+        "industry": null,
+        "overall_score": 92,
+        "skill_score": 86,
+        "relevant": true
+      },
+      {
+        "title": "Data Analyst (internship)",
+        "company": "Undisclosed Company",
+        "industry": "Marketing and Advertising",
+        "overall_score": 92,
+        "skill_score": 87,
+        "relevant": true
+      },
+      {
+        "title": "BI Interns",
+        "company": "Visual BI",
+        "industry": null,
+        "overall_score": 92,
+        "skill_score": 87,
+        "relevant": false
+      },
+      {
+        "title": "Data Analyst Intern",
+        "company": "Undisclosed Company",
+        "industry": "Marketing and Advertising",
+        "overall_score": 88,
+        "skill_score": 90,
+        "relevant": true
+      },
+      {
+        "title": "Software Engineer Intern",
+        "company": "Parrot Analytics",
+        "industry": "Information Technology and Services",
+        "overall_score": 82,
+        "skill_score": 84,
+        "relevant": true
+      }
+    ]
+  },
+  "sales_business": {
+    "precision_at_5": 1.0,
+    "results": [
+      {
+        "title": "Business Development Intern",
+        "company": "Undisclosed Company",
+        "industry": null,
+        "overall_score": 100,
+        "skill_score": 100,
+        "relevant": true
+      },
+      {
+        "title": "Intern",
+        "company": "Undisclosed Company",
+        "industry": "Internet",
+        "overall_score": 94,
+        "skill_score": 90,
+        "relevant": true
+      },
+      {
+        "title": "Business Development/Marketing intern",
+        "company": "Joomag",
+        "industry": null,
+        "overall_score": 92,
+        "skill_score": 87,
+        "relevant": true
+      },
+      {
+        "title": "Sales and Marketing Analyst Intern",
+        "company": "Undisclosed Company",
+        "industry": null,
+        "overall_score": 88,
+        "skill_score": 80,
+        "relevant": true
+      },
+      {
+        "title": "Suneris - Market Research and Strategy Internship Program",
+        "company": "Undisclosed Company",
+        "industry": "Biotechnology",
+        "overall_score": 88,
+        "skill_score": 80,
+        "relevant": true
+      }
+    ]
+  }
+}

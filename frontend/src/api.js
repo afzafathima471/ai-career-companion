@@ -69,6 +69,12 @@ export function getMatches(studentId) {
   return request(`/students/${studentId}/matches`);
 }
 
+export function getRecommendedInternships(studentId, { topK = 5, withReasoning = true } = {}) {
+  return request(
+    `/students/${studentId}/recommended-internships?top_k=${topK}&with_reasoning=${withReasoning}`
+  );
+}
+
 export function listJobs() {
   return request("/jobs");
 }

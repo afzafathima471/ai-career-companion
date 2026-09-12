@@ -3,7 +3,7 @@ import { LayoutGrid, FileText, Briefcase, MessagesSquare, ClipboardList, Setting
 const navItems = [
   { label: "Dashboard", icon: LayoutGrid },
   { label: "Resume", icon: FileText },
-  { label: "Internships", icon: Briefcase },
+  { label: "Job-Resume Matching", icon: Briefcase },
   { label: "Interview", icon: MessagesSquare },
   { label: "Applications", icon: ClipboardList },
 ];
