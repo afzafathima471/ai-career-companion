@@ -1,4 +1,3 @@
-import os
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -20,7 +19,7 @@ ALLOWED_TYPES = {
     "application/pdf": "pdf",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
 }
-MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+MAX_FILE_SIZE = 5 * 1024 * 1024
 
 
 @router.post("", response_model=schemas.ResumeOut, status_code=201)
@@ -43,11 +42,8 @@ async def upload_resume(student_id: str, file: UploadFile = File(...), db: Sessi
         f.write(contents)
 
     resume = models.Resume(
-        student_id=student_id,
-        filename=file.filename,
-        file_path=str(dest_path),
-        file_type=file_type,
-        parse_status="pending",
+        student_id=student_id, filename=file.filename, file_path=str(dest_path),
+        file_type=file_type, parse_status="pending",
     )
     db.add(resume)
     db.commit()
@@ -60,21 +56,12 @@ def list_resumes(student_id: str, db: Session = Depends(get_db)):
     student = db.query(models.Student).filter(models.Student.id == student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
-    return (
-        db.query(models.Resume)
-        .filter(models.Resume.student_id == student_id)
-        .order_by(models.Resume.uploaded_at.desc())
-        .all()
-    )
+    return db.query(models.Resume).filter(models.Resume.student_id == student_id).order_by(models.Resume.uploaded_at.desc()).all()
 
 
 @router.post("/{resume_id}/parse", response_model=schemas.ResumeOut)
 def parse_resume(student_id: str, resume_id: str, db: Session = Depends(get_db)):
-    resume = (
-        db.query(models.Resume)
-        .filter(models.Resume.id == resume_id, models.Resume.student_id == student_id)
-        .first()
-    )
+    resume = db.query(models.Resume).filter(models.Resume.id == resume_id, models.Resume.student_id == student_id).first()
     if not resume:
         raise HTTPException(status_code=404, detail="Resume not found")
 
@@ -85,43 +72,26 @@ def parse_resume(student_id: str, resume_id: str, db: Session = Depends(get_db))
 
         extracted = extract_resume_data(text)
 
-        # Replace this student's previously extracted data with the fresh parse.
         db.query(models.Skill).filter(models.Skill.student_id == student_id).delete()
         db.query(models.Education).filter(models.Education.student_id == student_id).delete()
         db.query(models.Experience).filter(models.Experience.student_id == student_id).delete()
         db.query(models.Project).filter(models.Project.student_id == student_id).delete()
+        db.query(models.Certification).filter(models.Certification.student_id == student_id).delete()
 
         for s in extracted["skills"]:
             db.add(models.Skill(student_id=student_id, name=s["name"], category=s.get("category", "technical")))
-
         for e in extracted["education"]:
-            db.add(models.Education(
-                student_id=student_id,
-                institution=e["institution"],
-                degree=e.get("degree"),
-                field=e.get("field"),
-                start_date=e.get("start_date"),
-                end_date=e.get("end_date"),
-            ))
-
+            db.add(models.Education(student_id=student_id, institution=e["institution"], degree=e.get("degree"),
+                                     field=e.get("field"), start_date=e.get("start_date"), end_date=e.get("end_date")))
         for ex in extracted["experience"]:
-            db.add(models.Experience(
-                student_id=student_id,
-                title=ex["title"],
-                organization=ex.get("organization"),
-                description=ex.get("description"),
-                start_date=ex.get("start_date"),
-                end_date=ex.get("end_date"),
-            ))
-
+            db.add(models.Experience(student_id=student_id, title=ex["title"], organization=ex.get("organization"),
+                                      description=ex.get("description"), start_date=ex.get("start_date"), end_date=ex.get("end_date")))
         for p in extracted["projects"]:
             techs = p.get("technologies") or []
-            db.add(models.Project(
-                student_id=student_id,
-                title=p["title"],
-                description=p.get("description"),
-                technologies=", ".join(techs) if isinstance(techs, list) else techs,
-            ))
+            db.add(models.Project(student_id=student_id, title=p["title"], description=p.get("description"),
+                                   technologies=", ".join(techs) if isinstance(techs, list) else techs))
+        for c in extracted.get("certifications", []):
+            db.add(models.Certification(student_id=student_id, name=c["name"], issuer=c.get("issuer")))
 
         resume.parse_status = "success"
         resume.parsed_at = datetime.now(timezone.utc)

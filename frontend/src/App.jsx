@@ -4,6 +4,8 @@ import Topbar from "./components/Topbar";
 import Dashboard from "./pages/Dashboard";
 import Resume from "./pages/Resume";
 import Internships from "./pages/Internships";
+import SkillGap from "./pages/SkillGap";
+import Customize from "./pages/Customize";
 import Interview from "./pages/Interview";
 import Applications from "./pages/Applications";
 import Settings from "./pages/Settings";
@@ -44,6 +46,8 @@ export default function App() {
     Dashboard: <Dashboard {...pageProps} />,
     Resume: <Resume {...pageProps} />,
     "Job-Resume Matching": <Internships {...pageProps} />,
+    "Skill Gap": <SkillGap {...pageProps} />,
+    Customize: <Customize {...pageProps} />,
     Interview: <Interview {...pageProps} />,
     Applications: <Applications {...pageProps} />,
     Settings: <Settings {...pageProps} onStudentUpdate={setStudent} onLogout={() => setStudent(null)} />,

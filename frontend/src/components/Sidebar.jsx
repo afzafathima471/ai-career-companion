@@ -1,9 +1,11 @@
-import { LayoutGrid, FileText, Briefcase, MessagesSquare, ClipboardList, Settings, HelpCircle } from "lucide-react";
+import { LayoutGrid, FileText, Briefcase, MessagesSquare, ClipboardList, TrendingUp, Wand2, Settings, HelpCircle } from "lucide-react";
 
 const navItems = [
   { label: "Dashboard", icon: LayoutGrid },
   { label: "Resume", icon: FileText },
   { label: "Job-Resume Matching", icon: Briefcase },
+  { label: "Skill Gap", icon: TrendingUp },
+  { label: "Customize", icon: Wand2 },
   { label: "Interview", icon: MessagesSquare },
   { label: "Applications", icon: ClipboardList },
 ];
@@ -14,8 +16,6 @@ const footerItems = [
 ];
 
 function CompassMark() {
-  // A small hand-drawn compass glyph — stands in for a logo, ties to the
-  // "guidance / navigation" idea behind the product rather than a stock icon.
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="12" r="9.5" stroke="#C9932E" strokeWidth="1.4" />

@@ -15,25 +15,12 @@ class StudentUpdate(BaseModel):
 
 class StudentOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-
     id: str
     name: str
     email: EmailStr
     target_role: str | None
     created_at: datetime
     updated_at: datetime
-
-
-class ResumeOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: str
-    student_id: str
-    filename: str
-    file_type: str
-    parse_status: str
-    uploaded_at: datetime
-    parsed_at: datetime | None
 
 
 class SkillOut(BaseModel):
@@ -71,6 +58,13 @@ class ProjectOut(BaseModel):
     technologies: str | None
 
 
+class CertificationOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    name: str
+    issuer: str | None
+
+
 class StudentProfileOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: str
@@ -81,6 +75,18 @@ class StudentProfileOut(BaseModel):
     education: list[EducationOut]
     experience: list[ExperienceOut]
     projects: list[ProjectOut]
+    certifications: list[CertificationOut]
+
+
+class ResumeOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: str
+    student_id: str
+    filename: str
+    file_type: str
+    parse_status: str
+    uploaded_at: datetime
+    parsed_at: datetime | None
 
 
 class JobOut(BaseModel):

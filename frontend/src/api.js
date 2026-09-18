@@ -8,21 +8,14 @@ async function request(path, options = {}) {
       const body = await res.json();
       detail = body.detail ?? detail;
     } catch {
-      // response wasn't JSON — keep statusText
+      // response wasn't JSON
     }
     throw new Error(detail);
   }
-  // 204 / empty responses
   const text = await res.text();
   return text ? JSON.parse(text) : null;
 }
 
-/**
- * Creates a student, or — if that email already exists — fetches the
- * existing one. There's no dedicated "get by email" endpoint yet, so this
- * falls back to scanning the list. Fine at this scale; revisit if the
- * student list grows.
- */
 export async function getOrCreateStudent({ name, email, target_role }) {
   try {
     return await request("/students", {
@@ -59,10 +52,11 @@ export function listResumes(studentId) {
 export async function uploadResume(studentId, file) {
   const formData = new FormData();
   formData.append("file", file);
-  return request(`/students/${studentId}/resumes`, {
-    method: "POST",
-    body: formData, // no Content-Type header — browser sets the multipart boundary
-  });
+  return request(`/students/${studentId}/resumes`, { method: "POST", body: formData });
+}
+
+export function parseResume(studentId, resumeId) {
+  return request(`/students/${studentId}/resumes/${resumeId}/parse`, { method: "POST" });
 }
 
 export function getMatches(studentId) {
@@ -75,12 +69,24 @@ export function getRecommendedInternships(studentId, { topK = 5, withReasoning =
   );
 }
 
-export function listJobs() {
-  return request("/jobs");
+export function getSkillGap(studentId, jobId, { withRecommendations = true } = {}) {
+  return request(
+    `/students/${studentId}/skill-gap/${jobId}?with_recommendations=${withRecommendations}`
+  );
 }
 
-export function parseResume(studentId, resumeId) {
-  return request(`/students/${studentId}/resumes/${resumeId}/parse`, {
+export function customizeResume(studentId, jobId, feedback = null) {
+  return request(`/students/${studentId}/customize/resume/${jobId}`, {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ feedback }),
+  });
+}
+
+export function customizeCoverLetter(studentId, jobId, feedback = null) {
+  return request(`/students/${studentId}/customize/cover-letter/${jobId}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ feedback }),
   });
 }

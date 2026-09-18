@@ -28,6 +28,7 @@ class Student(Base):
     education = relationship("Education", back_populates="student", cascade="all, delete-orphan")
     experience = relationship("Experience", back_populates="student", cascade="all, delete-orphan")
     projects = relationship("Project", back_populates="student", cascade="all, delete-orphan")
+    certifications = relationship("Certification", back_populates="student", cascade="all, delete-orphan")
 
 
 class Resume(Base):
@@ -37,8 +38,8 @@ class Resume(Base):
     student_id = Column(String, ForeignKey("students.id"), nullable=False, index=True)
     filename = Column(String, nullable=False)
     file_path = Column(String, nullable=False)
-    file_type = Column(String, nullable=False)  # "pdf" or "docx"
-    parse_status = Column(String, nullable=False, default="pending")  # pending | success | failed
+    file_type = Column(String, nullable=False)
+    parse_status = Column(String, nullable=False, default="pending")
     uploaded_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     parsed_at = Column(DateTime, nullable=True)
 
@@ -51,7 +52,7 @@ class Skill(Base):
     id = Column(String, primary_key=True, default=gen_uuid)
     student_id = Column(String, ForeignKey("students.id"), nullable=False, index=True)
     name = Column(String, nullable=False)
-    category = Column(String, nullable=False, default="technical")  # technical | soft | tool
+    category = Column(String, nullable=False, default="technical")
 
     student = relationship("Student", back_populates="skills")
 
@@ -91,9 +92,22 @@ class Project(Base):
     student_id = Column(String, ForeignKey("students.id"), nullable=False, index=True)
     title = Column(String, nullable=False)
     description = Column(String, nullable=True)
-    technologies = Column(String, nullable=True)  # comma-separated for simplicity
+    technologies = Column(String, nullable=True)
 
     student = relationship("Student", back_populates="projects")
+
+
+class Certification(Base):
+    """New for M3.1 — the Skill Gap Agent compares against certifications,
+    but nothing extracted or stored these before now."""
+    __tablename__ = "certifications"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    student_id = Column(String, ForeignKey("students.id"), nullable=False, index=True)
+    name = Column(String, nullable=False)
+    issuer = Column(String, nullable=True)
+
+    student = relationship("Student", back_populates="certifications")
 
 
 class Job(Base):
@@ -104,5 +118,5 @@ class Job(Base):
     company = Column(String, nullable=False)
     location = Column(String, nullable=True)
     description = Column(String, nullable=True)
-    required_skills = Column(String, nullable=False)  # comma-separated
+    required_skills = Column(String, nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
