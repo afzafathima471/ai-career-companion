@@ -90,3 +90,17 @@ export function customizeCoverLetter(studentId, jobId, feedback = null) {
     body: JSON.stringify({ feedback }),
   });
 }
+
+export function getInterviewPrep(studentId, jobId, questionsPerCategory = 2) {
+  return request(
+    `/students/${studentId}/interview-prep/${jobId}?questions_per_category=${questionsPerCategory}`
+  );
+}
+
+export function evaluateInterviewAnswer(studentId, question, answer) {
+  return request(`/students/${studentId}/interview-prep/evaluate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question, answer }),
+  });
+}
