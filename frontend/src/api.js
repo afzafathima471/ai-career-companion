@@ -104,3 +104,15 @@ export function evaluateInterviewAnswer(studentId, question, answer) {
     body: JSON.stringify({ question, answer }),
   });
 }
+
+export function sendAssistantMessage(studentId, message) {
+  return request(`/students/${studentId}/assistant/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message }),
+  });
+}
+
+export function getAssistantHistory(studentId) {
+  return request(`/students/${studentId}/assistant/history`);
+}

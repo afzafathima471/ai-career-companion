@@ -110,6 +110,20 @@ class Certification(Base):
     student = relationship("Student", back_populates="certifications")
 
 
+class ConversationMessage(Base):
+    """M3.4 -- persisted chat history per student, so the Career Assistant
+    has real context retention across turns, not just within one request."""
+    __tablename__ = "conversation_messages"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    student_id = Column(String, ForeignKey("students.id"), nullable=False, index=True)
+    role = Column(String, nullable=False)  # "user" | "assistant"
+    content = Column(String, nullable=False)
+    intent = Column(String, nullable=True)
+    referenced_job_id = Column(String, nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
 class Job(Base):
     __tablename__ = "jobs"
 

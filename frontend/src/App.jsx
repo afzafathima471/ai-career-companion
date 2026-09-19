@@ -7,6 +7,7 @@ import Internships from "./pages/Internships";
 import SkillGap from "./pages/SkillGap";
 import Customize from "./pages/Customize";
 import Interview from "./pages/Interview";
+import CareerAssistant from "./pages/CareerAssistant";
 import Applications from "./pages/Applications";
 import Settings from "./pages/Settings";
 import Help from "./pages/Help";
@@ -49,6 +50,7 @@ export default function App() {
     "Skill Gap": <SkillGap {...pageProps} />,
     Customize: <Customize {...pageProps} />,
     Interview: <Interview {...pageProps} />,
+    "Career Assistant": <CareerAssistant {...pageProps} />,
     Applications: <Applications {...pageProps} />,
     Settings: <Settings {...pageProps} onStudentUpdate={setStudent} onLogout={() => setStudent(null)} />,
     Help: <Help {...pageProps} />,

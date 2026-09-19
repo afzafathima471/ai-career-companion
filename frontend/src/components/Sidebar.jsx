@@ -1,4 +1,4 @@
-import { LayoutGrid, FileText, Briefcase, MessagesSquare, ClipboardList, TrendingUp, Wand2, Settings, HelpCircle } from "lucide-react";
+import { LayoutGrid, FileText, Briefcase, MessagesSquare, ClipboardList, TrendingUp, Wand2, Bot, Settings, HelpCircle } from "lucide-react";
 
 const navItems = [
   { label: "Dashboard", icon: LayoutGrid },
@@ -7,6 +7,7 @@ const navItems = [
   { label: "Skill Gap", icon: TrendingUp },
   { label: "Customize", icon: Wand2 },
   { label: "Interview", icon: MessagesSquare },
+  { label: "Career Assistant", icon: Bot },
   { label: "Applications", icon: ClipboardList },
 ];
 
