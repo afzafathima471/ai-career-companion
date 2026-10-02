@@ -116,3 +116,41 @@ export function sendAssistantMessage(studentId, message) {
 export function getAssistantHistory(studentId) {
   return request(`/students/${studentId}/assistant/history`);
 }
+
+// --- M4.1: Application Tracking ---
+
+export function createApplication(studentId, payload) {
+  return request(`/students/${studentId}/applications`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function listApplications(studentId, filters = {}) {
+  const params = new URLSearchParams(
+    Object.entries(filters).filter(([, v]) => v !== undefined && v !== null && v !== "")
+  );
+  const qs = params.toString();
+  return request(`/students/${studentId}/applications${qs ? `?${qs}` : ""}`);
+}
+
+export function getApplicationDashboard(studentId) {
+  return request(`/students/${studentId}/applications/dashboard`);
+}
+
+export function getApplicationReminders(studentId, windowDays = 7) {
+  return request(`/students/${studentId}/applications/reminders?window_days=${windowDays}`);
+}
+
+export function updateApplication(studentId, applicationId, payload) {
+  return request(`/students/${studentId}/applications/${applicationId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteApplication(studentId, applicationId) {
+  return request(`/students/${studentId}/applications/${applicationId}`, { method: "DELETE" });
+}

@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 load_dotenv()
 
 from .database import Base, engine
-from .routers import students, resumes, jobs, internships, matching, skill_gap, customize, interview, assistant
+from .routers import students, resumes, jobs, internships, matching, skill_gap, customize, interview, assistant, applications
 
 Base.metadata.create_all(bind=engine)
 
@@ -28,6 +28,7 @@ app.include_router(skill_gap.router)
 app.include_router(customize.router)
 app.include_router(interview.router)
 app.include_router(assistant.router)
+app.include_router(applications.router)
 
 
 @app.get("/")

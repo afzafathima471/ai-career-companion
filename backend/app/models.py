@@ -29,6 +29,7 @@ class Student(Base):
     experience = relationship("Experience", back_populates="student", cascade="all, delete-orphan")
     projects = relationship("Project", back_populates="student", cascade="all, delete-orphan")
     certifications = relationship("Certification", back_populates="student", cascade="all, delete-orphan")
+    applications = relationship("Application", back_populates="student", cascade="all, delete-orphan")
 
 
 class Resume(Base):
@@ -134,3 +135,34 @@ class Job(Base):
     description = Column(String, nullable=True)
     required_skills = Column(String, nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+class Application(Base):
+    __tablename__ = "applications"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    student_id = Column(String, ForeignKey("students.id"), nullable=False, index=True)
+    job_id = Column(String, nullable=True)
+
+    company = Column(String, nullable=False)
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+
+    status = Column(String, nullable=False, default="Saved")
+    application_date = Column(DateTime, nullable=True)
+    deadline = Column(DateTime, nullable=True)
+    interview_date = Column(DateTime, nullable=True)
+    interview_status = Column(String, nullable=True)
+    notes = Column(String, nullable=True)
+
+    resume_snapshot = Column(String, nullable=True)
+    cover_letter_snapshot = Column(String, nullable=True)
+
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(
+        DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
+
+    student = relationship("Student", back_populates="applications")
