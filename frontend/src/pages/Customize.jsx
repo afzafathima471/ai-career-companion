@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
-import { Loader2, AlertTriangle, RefreshCw, FileText, Mail } from "lucide-react";
-import { getRecommendedInternships, customizeResume, customizeCoverLetter } from "../api";
+import { Loader2, AlertTriangle, RefreshCw, FileText, Mail, BookmarkPlus } from "lucide-react";
+import {
+  getRecommendedInternships, customizeResume, customizeCoverLetter,
+  listApplications, createApplication, updateApplication,
+} from "../api";
 
 export default function Customize({ student }) {
   const [jobs, setJobs] = useState(null);
@@ -10,6 +13,7 @@ export default function Customize({ student }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [saveMsg, setSaveMsg] = useState("");
 
   useEffect(() => {
     getRecommendedInternships(student.id, { topK: 5, withReasoning: false })
@@ -21,6 +25,7 @@ export default function Customize({ student }) {
     setError("");
     setLoading(true);
     setResult(null);
+    setSaveMsg("");
     const call = currentMode === "resume" ? customizeResume : customizeCoverLetter;
     call(student.id, jobId, feedbackText)
       .then(setResult)
@@ -43,6 +48,30 @@ export default function Customize({ student }) {
   function regenerate() {
     if (!selectedJobId || !feedback.trim()) return;
     generate(selectedJobId, mode, feedback.trim());
+  }
+
+  // Attach the generated resume / cover letter to this internship's tracked application
+  // (creates the application as "Saved" if it isn't being tracked yet).
+  function saveToApplication() {
+    const job = jobs?.find((j) => j.job_id === selectedJobId);
+    if (!job || !result) return;
+    setSaveMsg("Saving...");
+    listApplications(student.id)
+      .then((apps) =>
+        apps.find((a) => String(a.job_id) === String(selectedJobId)) ||
+        createApplication(student.id, {
+          job_id: String(selectedJobId), company: job.company, title: job.title, status: "Saved",
+        })
+      )
+      .then((app) => {
+        const { _validation, ...clean } = result; // eslint-disable-line no-unused-vars
+        const payload = mode === "resume"
+          ? { resume_snapshot: JSON.stringify(clean) }
+          : { cover_letter_snapshot: result.cover_letter };
+        return updateApplication(student.id, app.id, payload);
+      })
+      .then(() => setSaveMsg(`Saved to Applications (${mode === "resume" ? "resume" : "cover letter"})`))
+      .catch((err) => setSaveMsg(err.message));
   }
 
   return (
@@ -112,6 +141,17 @@ export default function Customize({ student }) {
           )}
 
           {mode === "resume" ? <ResumeResult result={result} /> : <CoverLetterResult result={result} />}
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={saveToApplication}
+              className="flex items-center gap-1.5 border border-navy px-3.5 py-2 text-[13px] text-navy transition-colors hover:bg-navy hover:text-white"
+            >
+              <BookmarkPlus size={14} strokeWidth={1.75} />
+              Save to application
+            </button>
+            {saveMsg && <span className="text-[12px] text-ink/60">{saveMsg}</span>}
+          </div>
 
           <div className="border border-line bg-white px-5 py-4">
             <p className="mb-2 text-[13px] text-ink/60">Want a change? Describe it and regenerate.</p>

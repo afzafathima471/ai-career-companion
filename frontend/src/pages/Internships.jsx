@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Loader2, Sparkles } from "lucide-react";
-import { getRecommendedInternships } from "../api";
+import { Loader2, Sparkles, Check } from "lucide-react";
+import { getRecommendedInternships, listApplications, createApplication } from "../api";
 
 export default function Internships({ student }) {
   const [matches, setMatches] = useState(null);
   const [error, setError] = useState("");
+  const [tracked, setTracked] = useState({}); // job_id -> "adding" | "added"
 
   useEffect(() => {
     setMatches(null);
@@ -13,6 +14,20 @@ export default function Internships({ student }) {
       .then(setMatches)
       .catch((err) => setError(err.message));
   }, [student.id]);
+
+  // Add this internship to the application tracker (once; status "Planning to apply").
+  function addToTracker(m) {
+    setTracked((t) => ({ ...t, [m.job_id]: "adding" }));
+    listApplications(student.id)
+      .then((apps) =>
+        apps.some((a) => String(a.job_id) === String(m.job_id)) ||
+        createApplication(student.id, {
+          job_id: String(m.job_id), company: m.company, title: m.title, status: "Planning to apply",
+        })
+      )
+      .then(() => setTracked((t) => ({ ...t, [m.job_id]: "added" })))
+      .catch((err) => { setError(err.message); setTracked((t) => ({ ...t, [m.job_id]: undefined })); });
+  }
 
   return (
     <div className="px-10 py-8">
@@ -85,9 +100,19 @@ export default function Internships({ student }) {
             </div>
 
             <div className="mt-4 flex justify-end border-t border-line pt-3">
-              <button className="bg-navy px-3.5 py-1.5 text-[12px] text-white transition-opacity hover:opacity-90">
-                Apply
-              </button>
+              {tracked[m.job_id] === "added" ? (
+                <span className="flex items-center gap-1 text-[12px] text-sage">
+                  <Check size={13} /> In your tracker
+                </span>
+              ) : (
+                <button
+                  onClick={() => addToTracker(m)}
+                  disabled={tracked[m.job_id] === "adding"}
+                  className="bg-navy px-3.5 py-1.5 text-[12px] text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                >
+                  {tracked[m.job_id] === "adding" ? "Adding..." : "Add to tracker"}
+                </button>
+              )}
             </div>
           </div>
         ))}

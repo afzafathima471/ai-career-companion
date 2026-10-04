@@ -105,7 +105,9 @@ def compute_reminders(applications: list[dict], today: datetime = None, window_d
 
 def filter_applications(applications: list[dict], company: str = None, title: str = None,
                           status: str = None, deadline_before: datetime = None,
-                          deadline_after: datetime = None) -> list[dict]:
+                          deadline_after: datetime = None,
+                          application_date_before: datetime = None,
+                          application_date_after: datetime = None) -> list[dict]:
     """In-memory filtering over an already-fetched list -- kept here
     (rather than only as a SQL query in the router) so the filtering
     rules themselves are unit-testable independent of a database."""
@@ -120,4 +122,8 @@ def filter_applications(applications: list[dict], company: str = None, title: st
         result = [a for a in result if a.get("deadline") and a["deadline"] <= deadline_before]
     if deadline_after:
         result = [a for a in result if a.get("deadline") and a["deadline"] >= deadline_after]
+    if application_date_before:
+        result = [a for a in result if a.get("application_date") and a["application_date"] <= application_date_before]
+    if application_date_after:
+        result = [a for a in result if a.get("application_date") and a["application_date"] >= application_date_after]
     return result

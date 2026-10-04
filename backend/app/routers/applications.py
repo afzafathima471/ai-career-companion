@@ -41,6 +41,8 @@ def list_applications(
     status: str | None = Query(None),
     deadline_before: datetime | None = Query(None),
     deadline_after: datetime | None = Query(None),
+    application_date_before: datetime | None = Query(None),
+    application_date_after: datetime | None = Query(None),
     db: Session = Depends(get_db),
 ):
     _ensure_student(student_id, db)
@@ -49,11 +51,13 @@ def list_applications(
     # Filtering logic lives in application_tracker.py (testable in isolation);
     # here we just adapt ORM rows <-> dicts at the boundary.
     as_dicts = {a.id: a for a in all_apps}
-    dict_rows = [{"id": a.id, "company": a.company, "title": a.title, "status": a.status, "deadline": a.deadline} for a in all_apps]
+    dict_rows = [{"id": a.id, "company": a.company, "title": a.title, "status": a.status, "deadline": a.deadline,
+                  "application_date": a.application_date} for a in all_apps]
     filtered_ids = {
         row["id"] for row in filter_applications(
             dict_rows, company=company, title=title, status=status,
             deadline_before=deadline_before, deadline_after=deadline_after,
+            application_date_before=application_date_before, application_date_after=application_date_after,
         )
     }
     result = [as_dicts[i] for i in as_dicts if i in filtered_ids]

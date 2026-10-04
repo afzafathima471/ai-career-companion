@@ -135,6 +135,7 @@ class ApplicationCreate(BaseModel):
 
 class ApplicationUpdate(BaseModel):
     status: str | None = None
+    description: str | None = None
     application_date: datetime | None = None
     deadline: datetime | None = None
     interview_date: datetime | None = None
