@@ -111,13 +111,27 @@ class Certification(Base):
     student = relationship("Student", back_populates="certifications")
 
 
+class Conversation(Base):
+    """One named chat (like a ChatGPT/Claude chat). A student can have many;
+    each keeps its own message history and its own 'job under discussion'."""
+    __tablename__ = "conversations"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    student_id = Column(String, ForeignKey("students.id"), nullable=False, index=True)
+    title = Column(String, nullable=False, default="New chat")
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
 class ConversationMessage(Base):
     """M3.4 -- persisted chat history per student, so the Career Assistant
-    has real context retention across turns, not just within one request."""
+    has real context retention across turns, not just within one request.
+    Since M4.5 each message belongs to a Conversation (conversation_id)."""
     __tablename__ = "conversation_messages"
 
     id = Column(String, primary_key=True, default=gen_uuid)
     student_id = Column(String, ForeignKey("students.id"), nullable=False, index=True)
+    conversation_id = Column(String, ForeignKey("conversations.id"), nullable=True, index=True)
     role = Column(String, nullable=False)  # "user" | "assistant"
     content = Column(String, nullable=False)
     intent = Column(String, nullable=True)

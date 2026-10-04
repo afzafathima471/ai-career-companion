@@ -9,6 +9,9 @@ from .routers import students, resumes, jobs, internships, matching, skill_gap, 
 
 Base.metadata.create_all(bind=engine)
 
+from .migrations import run_migrations
+run_migrations(engine)
+
 app = FastAPI(title="AI Career Companion API")
 
 app.add_middleware(

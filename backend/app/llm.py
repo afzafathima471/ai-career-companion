@@ -2,6 +2,8 @@ import json
 import os
 from groq import Groq
 
+from .certifications import merge_certifications
+
 GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 
 _client = None
@@ -36,9 +38,15 @@ Rules:
 - Dates: keep whatever format the resume uses (e.g. "Jan 2024", "2023", "2022-2024"). Don't invent dates.
 - Don't invent skills, roles, projects, or certifications that aren't in the text.
 - "technologies" should list specific tools/languages/frameworks mentioned for that project, not soft skills.
-- "certifications" means formal certifications, courses with a completion certificate, or credentials
-  (e.g. "AWS Certified Cloud Practitioner", "Google Data Analytics Certificate") — not just any course
-  mentioned in passing.
+- "certifications": include EVERY certification, license, credential, and online/offline course, training,
+  workshop or internship for which a certificate or completion is listed — e.g. "AWS Certified Cloud
+  Practitioner", "Google Data Analytics Certificate", NPTEL / Coursera / Udemy / Infosys Springboard /
+  HackerRank / Oracle / Microsoft / Cisco courses. Look in sections titled Certifications, Certificates,
+  Licenses, Courses, Training, Online Courses, Workshops, Achievements and Awards, AND in education,
+  skills or summary text. One entry per certification, with the name exactly as written; "issuer" is the
+  organisation or platform if stated (often after "by", "from", "-" or in brackets), otherwise null.
+  Do NOT include ordinary university subjects/coursework, hackathon placements, or general awards that
+  are not certificates. Return an empty list only if the resume truly has none.
 
 Resume text:
 \"\"\"
@@ -66,5 +74,8 @@ def extract_resume_data(resume_text: str) -> dict:
 
     for key in ("skills", "education", "experience", "projects", "certifications"):
         data.setdefault(key, [])
+
+    # Safety net: clean the model's entries and add any listed under a "Certifications"-style heading it missed.
+    data["certifications"] = merge_certifications(data["certifications"], resume_text)
 
     return data

@@ -105,12 +105,34 @@ export function evaluateInterviewAnswer(studentId, question, answer) {
   });
 }
 
-export function sendAssistantMessage(studentId, message) {
+// conversationId = null starts a NEW chat (named after the first message);
+// pass an id to continue an existing chat.
+export function sendAssistantMessage(studentId, message, conversationId = null) {
   return request(`/students/${studentId}/assistant/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message }),
+    body: JSON.stringify({ message, conversation_id: conversationId }),
   });
+}
+
+export function listConversations(studentId) {
+  return request(`/students/${studentId}/assistant/conversations`);
+}
+
+export function getConversationMessages(studentId, conversationId) {
+  return request(`/students/${studentId}/assistant/conversations/${conversationId}/messages`);
+}
+
+export function renameConversation(studentId, conversationId, title) {
+  return request(`/students/${studentId}/assistant/conversations/${conversationId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title }),
+  });
+}
+
+export function deleteConversation(studentId, conversationId) {
+  return request(`/students/${studentId}/assistant/conversations/${conversationId}`, { method: "DELETE" });
 }
 
 export function getAssistantHistory(studentId) {

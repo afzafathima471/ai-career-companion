@@ -15,7 +15,7 @@ export default function Resume({ student }) {
     // If this student already has a parsed profile from an earlier session, show it.
     getProfile(student.id)
       .then((p) => {
-        if (p.skills.length || p.education.length || p.experience.length || p.projects.length) {
+        if (p.skills.length || p.education.length || p.experience.length || p.projects.length || p.certifications.length) {
           setProfile(p);
           setStage("done");
         }
@@ -159,6 +159,19 @@ export default function Resume({ student }) {
                       {p.technologies && (
                         <p className="mt-1 text-[12px] text-ink/45">{p.technologies}</p>
                       )}
+                    </div>
+                  ))
+                )}
+              </Section>
+
+              <Section title="Certifications">
+                {profile.certifications.length === 0 ? (
+                  <EmptyNote />
+                ) : (
+                  profile.certifications.map((c) => (
+                    <div key={c.id} className="mb-2 text-[14px]">
+                      <p className="text-ink">{c.name}</p>
+                      {c.issuer && <p className="text-[12px] text-ink/50">{c.issuer}</p>}
                     </div>
                   ))
                 )}
