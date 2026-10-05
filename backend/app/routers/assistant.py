@@ -8,6 +8,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from .. import models
+from ..dataset import load_dataset
 from ..database import get_db
 from ..career_assistant import route_intent, resolve_job_ids, gather_context, synthesize_response
 
@@ -31,9 +32,7 @@ def _profile_dict(student_id: str, db: Session) -> dict:
     }
 
 
-def _load_dataset() -> list[dict]:
-    with open(DATASET_PATH) as f:
-        return json.load(f)
+
 
 
 def _iso(dt):
@@ -150,7 +149,7 @@ def chat(student_id: str, db: Session = Depends(get_db), message: str = Body(...
     routing = route_intent(message, history, known_job_ids)
     job_ids = resolve_job_ids(routing["referenced_job_ids"], last_discussed)
 
-    dataset = _load_dataset()
+    dataset = load_dataset()
     postings = [p for jid in job_ids for p in dataset if p["source_job_id"] == jid]
 
     grounding = gather_context(routing["intent"], postings, profile, message)

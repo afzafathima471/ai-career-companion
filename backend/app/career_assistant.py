@@ -177,7 +177,7 @@ def synthesize_response(message: str, history: list[dict], grounding: dict, prof
 
     prompt = SYNTHESIS_PROMPT.format(
         profile_summary=profile_summary, history=history_text, message=message,
-        grounding=json.dumps(grounding, indent=2),
+        grounding=json.dumps(grounding, separators=(",", ":")),
     )
     completion = client.chat.completions.create(
         model=GROQ_MODEL,

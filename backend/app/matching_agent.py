@@ -19,6 +19,7 @@ import json
 
 from .rag.search import semantic_search
 from .llm import get_client, GROQ_MODEL
+from .skill_gap_agent import SKILL_FAMILIES
 
 # Coarse ordering for degree comparison — real EMSCAD values on the left.
 EDUCATION_LEVELS = {
@@ -52,20 +53,28 @@ def score_skills(student_skills: list[str], required: list[str], preferred: list
     pref_set = {s.lower() for s in preferred}
 
     if not req_set and not pref_set:
-        return {"score": 50, "matched_required": [], "missing_required": [], "matched_preferred": []}
+        return {"score": 50, "matched_required": [], "missing_required": [],
+                "partially_matched_required": [], "matched_preferred": []}
 
     req_matched = req_set & student_set
-    req_missing = req_set - student_set
+    req_remaining = req_set - student_set
+
+    partially_matched, still_missing = [], []
+    for skill in req_remaining:
+        related = [s for s in SKILL_FAMILIES.get(skill, []) if s in student_set]
+        (partially_matched if related else still_missing).append(skill)
+
     pref_matched = pref_set & student_set
 
-    req_score = (len(req_matched) / len(req_set)) if req_set else 1.0
+    req_score = ((len(req_matched) + 0.5 * len(partially_matched)) / len(req_set)) if req_set else 1.0
     pref_score = (len(pref_matched) / len(pref_set)) if pref_set else 0.0
     combined = req_score * 0.8 + pref_score * 0.2
 
     return {
         "score": round(combined * 100),
         "matched_required": sorted(req_matched),
-        "missing_required": sorted(req_missing),
+        "partially_matched_required": sorted(partially_matched),
+        "missing_required": sorted(still_missing),
         "matched_preferred": sorted(pref_matched),
     }
 
@@ -118,6 +127,7 @@ def score_candidate(profile: dict, posting: dict) -> dict:
         "education_score": education_score,
         "experience_score": experience_score,
         "matched_required_skills": skills["matched_required"],
+        "partially_matched_required_skills": skills["partially_matched_required"],
         "missing_required_skills": skills["missing_required"],
         "matched_preferred_skills": skills["matched_preferred"],
     }

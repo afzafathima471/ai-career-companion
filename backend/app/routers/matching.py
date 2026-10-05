@@ -44,6 +44,7 @@ def get_recommended_internships(
             "education_score": r["education_score"],
             "experience_score": r["experience_score"],
             "matched_required_skills": r["matched_required_skills"],
+            "partially_matched_required_skills": r["partially_matched_required_skills"],
             "missing_required_skills": r["missing_required_skills"],
             "matched_preferred_skills": r["matched_preferred_skills"],
             "retrieval_score": r["retrieval_score"],

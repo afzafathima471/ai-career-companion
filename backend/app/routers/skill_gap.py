@@ -1,5 +1,4 @@
-import json
-from pathlib import Path
+from ..dataset import get_posting
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
@@ -10,7 +9,7 @@ from ..skill_gap_agent import analyze_skill_gap
 
 router = APIRouter(prefix="/students/{student_id}", tags=["skill-gap-agent"])
 
-DATASET_PATH = Path(__file__).resolve().parent.parent / "data_pipeline" / "internship_dataset.json"
+
 
 
 def _profile_dict(student_id: str, db: Session) -> dict:
@@ -30,13 +29,7 @@ def _profile_dict(student_id: str, db: Session) -> dict:
     }
 
 
-def _get_posting(job_id: int) -> dict:
-    with open(DATASET_PATH) as f:
-        postings = json.load(f)
-    posting = next((p for p in postings if p["source_job_id"] == job_id), None)
-    if not posting:
-        raise HTTPException(status_code=404, detail="Job posting not found in the internship knowledge base")
-    return posting
+
 
 
 @router.get("/skill-gap/{job_id}")
@@ -47,7 +40,9 @@ def get_skill_gap(
     db: Session = Depends(get_db),
 ):
     profile = _profile_dict(student_id, db)
-    posting = _get_posting(job_id)
+    posting = get_posting(job_id)
+    if not posting:
+        raise HTTPException(status_code=404, detail="Job posting not found in the internship knowledge base")
     result = analyze_skill_gap(profile, posting, with_recommendations=with_recommendations)
     return {
         "job_id": job_id,
