@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -12,7 +13,7 @@ router = APIRouter(prefix="/students", tags=["students"])
 def create_student(payload: schemas.StudentCreate, db: Session = Depends(get_db)):
     student = models.Student(
         name=payload.name,
-        email=payload.email,
+        email=payload.email.lower(),
         target_role=payload.target_role,
     )
     db.add(student)
@@ -28,6 +29,17 @@ def create_student(payload: schemas.StudentCreate, db: Session = Depends(get_db)
 @router.get("", response_model=list[schemas.StudentOut])
 def list_students(db: Session = Depends(get_db)):
     return db.query(models.Student).order_by(models.Student.created_at.desc()).all()
+
+@router.get("/lookup", response_model=schemas.StudentOut)
+def lookup_student(email: str, db: Session = Depends(get_db)):
+    student = (
+        db.query(models.Student)
+        .filter(func.lower(models.Student.email) == email.strip().lower())
+        .first()
+    )
+    if not student:
+        raise HTTPException(status_code=404, detail="No account found with this email")
+    return student
 
 
 @router.get("/{student_id}", response_model=schemas.StudentOut)
@@ -46,10 +58,16 @@ def update_student(student_id: str, payload: schemas.StudentUpdate, db: Session 
 
     if payload.name is not None:
         student.name = payload.name
+    if payload.email is not None:
+        student.email = payload.email.lower()
     if payload.target_role is not None:
         student.target_role = payload.target_role
 
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="A student with this email already exists")
     db.refresh(student)
     return student
 

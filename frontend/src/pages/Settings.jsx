@@ -1,3 +1,4 @@
+import { updateStudent } from "../api";
 import { useState } from "react";
 
 function Toggle({ checked, onChange }) {
@@ -19,12 +20,43 @@ function Toggle({ checked, onChange }) {
   );
 }
 
-export default function Settings({ onLogout }) {
-  const [name, setName] = useState("Afza Fathima");
-  const [email, setEmail] = useState("afza@example.com");
+export default function Settings({ student, onStudentUpdate, onLogout }) {
+  const [name, setName] = useState(student.name);
+  const [email, setEmail] = useState(student.email);
+  const [targetRole, setTargetRole] = useState(student.target_role || "");
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState(null);
   const [emailAlerts, setEmailAlerts] = useState(true);
   const [matchAlerts, setMatchAlerts] = useState(true);
   const [weeklyDigest, setWeeklyDigest] = useState(false);
+  
+  async function handleSave() {
+    setMessage(null);
+    if (!name.trim() || !email.trim()) {
+      setMessage({ ok: false, text: "Name and email can't be empty." });
+      return;
+    }
+    setSaving(true);
+    try {
+      const updated = await updateStudent(student.id, {
+        name: name.trim(),
+        email: email.trim(),
+        target_role: targetRole,
+      });
+      onStudentUpdate(updated);
+      setMessage({ ok: true, text: "Saved." });
+    } catch (err) {
+      const msg = String(err.message);
+      setMessage({
+        ok: false,
+        text: msg.toLowerCase().includes("already exists")
+          ? "That email is already used by another account."
+          : msg,
+      });
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <div className="max-w-2xl px-10 py-8">
@@ -67,15 +99,27 @@ export default function Settings({ onLogout }) {
             <label className="text-[13px] text-ink/70">Target role</label>
             <input
               type="text"
-              defaultValue="Frontend / Full Stack Intern"
+              value={targetRole}
+              onChange={(e) => setTargetRole(e.target.value)}
               className="mt-1.5 w-full border border-line bg-white px-3.5 py-2.5 text-[14px] text-ink outline-none focus:border-navy"
             />
           </div>
         </div>
 
-        <button className="mt-6 bg-navy px-4 py-2.5 text-[13px] font-medium text-white transition-opacity hover:opacity-90">
-          Save changes
-        </button>
+        <div className="mt-6 flex items-center gap-3">
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="bg-navy px-4 py-2.5 text-[13px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+        >
+            {saving ? "Saving..." : "Save changes"}
+          </button>
+          {message && (
+            <span className={`text-[13px] ${message.ok ? "text-ink/60" : "text-red-600"}`}>
+            {message.text}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="mt-6 border border-line bg-white px-6 py-6">

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getOrCreateStudent } from "../api";
+import { createStudent, loginStudent } from "../api";
 
 function CompassMark({ size = 26 }) {
   return (
@@ -52,24 +52,30 @@ export default function Login({ onLogin }) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [mode, setMode] = useState("login");
+  const isSignup = mode === "signup";
+  const [targetRole, setTargetRole] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      // No real auth yet — password isn't checked against anything.
-      // This creates (or fetches, if the email already exists) a real
-      // student record in the backend, so everything after login uses
-      // real data instead of a mock.
-      const student = await getOrCreateStudent({ name, email, target_role: null });
+      const student = isSignup
+        ? await createStudent({ name, email, target_role: targetRole.trim() || null })
+        : await loginStudent(email);
       onLogin?.(student);
     } catch (err) {
-      setError(
-        err.message.includes("fetch")
-          ? "Couldn't reach the backend — is it running at http://127.0.0.1:8000?"
-          : err.message
-      );
+      const msg = String(err.message).toLowerCase();
+      if (msg.includes("fetch")) {
+        setError("Couldn't reach the server. If it was idle, wait a minute and try again.");
+      } else if (isSignup && msg.includes("already exists")) {
+        setError("An account with this email already exists. Please log in instead.");
+      } else if (!isSignup && msg.includes("no account")) {
+        setError("No account found with this email. Please create an account first.");
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -110,12 +116,15 @@ export default function Login({ onLogin }) {
             <span className="font-display text-lg text-ink">CareerAI</span>
           </div>
 
-          <h1 className="font-display text-[26px] text-ink">Welcome back</h1>
+          <h1 className="font-display text-[26px] text-ink">
+            {isSignup ? "Create your account" : "Welcome back"}
+          </h1>
           <p className="mt-1.5 text-[14px] text-ink/55">
-            Log in to pick up where you left off.
+          {isSignup ? "Sign up to start preparing for your next step." : "Log in to pick up where you left off."}
           </p>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+            {isSignup && (     
             <div>
               <label htmlFor="name" className="text-[13px] text-ink/70">
                 Full name
@@ -130,6 +139,7 @@ export default function Login({ onLogin }) {
                 className="mt-1.5 w-full border border-line bg-white px-3.5 py-2.5 text-[14px] text-ink outline-none placeholder:text-ink/30 focus:border-navy"
               />
             </div>
+            )}
 
             <div>
               <label htmlFor="email" className="text-[13px] text-ink/70">
@@ -145,6 +155,22 @@ export default function Login({ onLogin }) {
                 className="mt-1.5 w-full border border-line bg-white px-3.5 py-2.5 text-[14px] text-ink outline-none placeholder:text-ink/30 focus:border-navy"
               />
             </div>
+            
+            {isSignup && (
+            <div>
+              <label htmlFor="targetRole" className="text-[13px] text-ink/70">
+                Target role
+              </label>
+              <input
+                id="targetRole"
+                type="text"
+                value={targetRole}
+                onChange={(e) => setTargetRole(e.target.value)}
+                placeholder="Frontend / Full Stack Intern"
+                className="mt-1.5 w-full border border-line bg-white px-3.5 py-2.5 text-[14px] text-ink outline-none placeholder:text-ink/30 focus:border-navy"
+              />
+           </div>
+            )}
 
             <div>
               <label htmlFor="password" className="text-[13px] text-ink/70">
@@ -182,13 +208,19 @@ export default function Login({ onLogin }) {
               disabled={loading}
               className="w-full bg-navy py-2.5 text-[14px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-60"
             >
-              {loading ? "Logging in..." : "Log in"}
+              {loading ? "Please wait..." : isSignup ? "Create account" : "Log in"}
             </button>
           </form>
 
           <p className="mt-6 text-center text-[13px] text-ink/55">
-            New here?{" "}
-            <button className="text-navy hover:opacity-70">Create an account</button>
+            {isSignup ? "Already have an account?" : "New here?"}{" "}
+            <button
+              type="button"
+              onClick={() => { setMode(isSignup ? "login" : "signup"); setError(""); }}
+              className="text-navy hover:opacity-70"
+            >
+              {isSignup ? "Log in" : "Create an account"}
+            </button>
           </p>
         </div>
       </div>

@@ -33,6 +33,18 @@ export async function getOrCreateStudent({ name, email, target_role }) {
   }
 }
 
+export function createStudent({ name, email, target_role = null }) {
+  return request("/students", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, target_role }),
+  });
+}
+
+export function loginStudent(email) {
+  return request(`/students/lookup?email=${encodeURIComponent(email)}`);
+}
+
 export function updateStudent(studentId, payload) {
   return request(`/students/${studentId}`, {
     method: "PATCH",

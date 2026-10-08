@@ -11,6 +11,7 @@ class StudentCreate(BaseModel):
 
 class StudentUpdate(BaseModel):
     name: str | None = None
+    email: EmailStr | None = None
     target_role: str | None = None
 
 

@@ -44,7 +44,7 @@ export default function App() {
   const pageProps = { student };
 
   const pages = {
-    Dashboard: <Dashboard {...pageProps} />,
+    Dashboard: <Dashboard {...pageProps} onNavigate={setActive} />,
     Resume: <Resume {...pageProps} />,
     "Job-Resume Matching": <Internships {...pageProps} />,
     "Skill Gap": <SkillGap {...pageProps} />,
@@ -52,7 +52,7 @@ export default function App() {
     Interview: <Interview {...pageProps} />,
     "Career Assistant": <CareerAssistant {...pageProps} />,
     Applications: <Applications {...pageProps} />,
-    Settings: <Settings {...pageProps} onStudentUpdate={setStudent} onLogout={() => setStudent(null)} />,
+    Settings: <Settings {...pageProps} onStudentUpdate={setStudent} onLogout={() => { setStudent(null); setActive("Dashboard"); }} />,
     Help: <Help {...pageProps} />,
   };
 
@@ -60,7 +60,13 @@ export default function App() {
     <div className="flex bg-paper">
       <Sidebar active={active} onNavigate={setActive} />
       <main className="flex-1">
-        <Topbar title={active} userName={student.name} />
+        <Topbar
+          title={active}
+          userName={student.name}
+          studentId={student.id}
+          onProfileClick={() => setActive("Settings")}
+          onNavigate={setActive}
+        />
         {pages[active] ?? pages.Dashboard}
       </main>
     </div>
