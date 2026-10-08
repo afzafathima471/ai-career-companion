@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Loader2, Sparkles, Check } from "lucide-react";
-import { getRecommendedInternships, listApplications, createApplication } from "../api";
+import { getRecommendedInternships, listApplications, createApplication, applyToInternship } from "../api";
 
 export default function Internships({ student }) {
   const [matches, setMatches] = useState(null);
   const [error, setError] = useState("");
   const [tracked, setTracked] = useState({}); // job_id -> "adding" | "added"
+  const [applied, setApplied] = useState({}); // job_id -> "applying" | "applied"
 
   useEffect(() => {
     setMatches(null);
@@ -14,6 +15,36 @@ export default function Internships({ student }) {
       .then(setMatches)
       .catch((err) => setError(err.message));
   }, [student.id]);
+
+  // Remember what was already tracked / applied (survives a page refresh).
+  useEffect(() => {
+    listApplications(student.id)
+      .then((apps) => {
+        const t = {}, a = {};
+        apps.forEach((x) => {
+          if (!x.job_id) return;
+          t[x.job_id] = "added";
+          if (x.status !== "Saved" && x.status !== "Planning to apply") a[x.job_id] = "applied";
+        });
+        setTracked((p) => ({ ...t, ...p }));
+        setApplied((p) => ({ ...a, ...p }));
+      })
+      .catch(() => {});
+  }, [student.id]);
+
+  // Apply = record the application in the tracker with status "Applied".
+  function apply(m) {
+    setApplied((s) => ({ ...s, [m.job_id]: "applying" }));
+    applyToInternship(student.id, m)
+      .then(() => {
+        setApplied((s) => ({ ...s, [m.job_id]: "applied" }));
+        setTracked((t) => ({ ...t, [m.job_id]: "added" }));
+      })
+      .catch((err) => {
+        setError(err.message);
+        setApplied((s) => ({ ...s, [m.job_id]: undefined }));
+      });
+  }
 
   // Add this internship to the application tracker (once; status "Planning to apply").
   function addToTracker(m) {
@@ -99,19 +130,34 @@ export default function Internships({ student }) {
               )}
             </div>
 
-            <div className="mt-4 flex justify-end border-t border-line pt-3">
-              {tracked[m.job_id] === "added" ? (
+            <div className="mt-4 flex items-center justify-end gap-3 border-t border-line pt-3">
+              {applied[m.job_id] === "applied" ? (
                 <span className="flex items-center gap-1 text-[12px] text-sage">
-                  <Check size={13} /> In your tracker
+                  <Check size={13} /> Applied
                 </span>
               ) : (
-                <button
-                  onClick={() => addToTracker(m)}
-                  disabled={tracked[m.job_id] === "adding"}
-                  className="bg-navy px-3.5 py-1.5 text-[12px] text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-                >
-                  {tracked[m.job_id] === "adding" ? "Adding..." : "Add to tracker"}
-                </button>
+                <>
+                  {tracked[m.job_id] === "added" ? (
+                    <span className="flex items-center gap-1 text-[12px] text-sage">
+                      <Check size={13} /> In your tracker
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => addToTracker(m)}
+                      disabled={tracked[m.job_id] === "adding"}
+                      className="border border-line px-3.5 py-1.5 text-[12px] text-ink/70 transition-colors hover:border-navy/40 disabled:opacity-50"
+                    >
+                      {tracked[m.job_id] === "adding" ? "Adding..." : "Add to tracker"}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => apply(m)}
+                    disabled={applied[m.job_id] === "applying"}
+                    className="bg-navy px-3.5 py-1.5 text-[12px] text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                  >
+                    {applied[m.job_id] === "applying" ? "Applying..." : "Apply"}
+                  </button>
+                </>
               )}
             </div>
           </div>

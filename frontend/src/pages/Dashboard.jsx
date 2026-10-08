@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import StatCard from "../components/StatCard";
 import InternshipRow from "../components/InternshipRow";
-import { getProfile, getRecommendedInternships, getApplicationDashboard } from "../api";
+import { getProfile, getRecommendedInternships, getApplicationDashboard, listApplications, applyToInternship } from "../api";
 
 export default function Dashboard({ student, onNavigate }) {
   const [profile, setProfile] = useState(null);
   const [matches, setMatches] = useState([]);
   const [appStats, setAppStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [applied, setApplied] = useState({});
 
   useEffect(() => {
     setLoading(true);
@@ -16,10 +17,16 @@ export default function Dashboard({ student, onNavigate }) {
       getProfile(student.id).catch(() => null),
       getRecommendedInternships(student.id, { topK: 20, withReasoning: false }).catch(() => []),
       getApplicationDashboard(student.id).catch(() => null),
-    ]).then(([p, m, a]) => {
+      listApplications(student.id).catch(() => []),
+    ]).then(([p, m, a, apps]) => {
       setProfile(p);
       setMatches(m);
       setAppStats(a);
+      const done = {};
+      apps.forEach((x) => {
+        if (x.job_id && x.status !== "Saved" && x.status !== "Planning to apply") done[x.job_id] = "applied";
+      });
+      setApplied(done);
       setLoading(false);
     });
   }, [student.id]);
@@ -29,6 +36,16 @@ export default function Dashboard({ student, onNavigate }) {
   const topMatches = matches.slice(0, 4);
   const firstName = student.name.split(" ")[0];
   const show = (v) => (loading ? "—" : v);
+
+  function apply(m) {
+    setApplied((s) => ({ ...s, [m.job_id]: "applying" }));
+    applyToInternship(student.id, m)
+      .then(() => {
+        setApplied((s) => ({ ...s, [m.job_id]: "applied" }));
+        getApplicationDashboard(student.id).then(setAppStats).catch(() => {});
+      })
+      .catch(() => setApplied((s) => ({ ...s, [m.job_id]: undefined })));
+  }
 
   return (
     <div className="px-10 py-8">
@@ -80,6 +97,8 @@ export default function Dashboard({ student, onNavigate }) {
                 company={m.company}
                 location={m.location || "—"}
                 match={Math.round(m.overall_score)}
+                status={applied[m.job_id]}
+                onApply={() => apply(m)}
               />
             ))}
         </div>

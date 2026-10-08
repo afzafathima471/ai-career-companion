@@ -188,3 +188,23 @@ export function updateApplication(studentId, applicationId, payload) {
 export function deleteApplication(studentId, applicationId) {
   return request(`/students/${studentId}/applications/${applicationId}`, { method: "DELETE" });
 }
+
+export async function applyToInternship(studentId, job) {
+  const apps = await listApplications(studentId);
+  const existing = apps.find((a) => String(a.job_id) === String(job.job_id));
+  const now = new Date().toISOString().slice(0, 19);
+
+  if (existing) {
+    if (existing.status === "Saved" || existing.status === "Planning to apply") {
+      return updateApplication(studentId, existing.id, { status: "Applied", application_date: now });
+    }
+    return existing; // already applied or further along
+  }
+  return createApplication(studentId, {
+    job_id: String(job.job_id),
+    company: job.company,
+    title: job.title,
+    status: "Applied",
+    application_date: now,
+  });
+}
